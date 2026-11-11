@@ -1,0 +1,1088 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multi-Domain Intelligence & Analytics Portal</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0f7ff',
+                            100: '#e0effe',
+                            500: '#0284c7',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            800: '#075985',
+                            900: '#0c4a6e',
+                        },
+                        emeraldCustom: '#10b981',
+                        roseCustom: '#f43f5e',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Lucide Icons CDN -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Custom scrollbar for inner scrollable areas */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(156, 163, 175, 0.4);
+            border-radius: 9999px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(156, 163, 175, 0.7);
+        }
+    </style>
+</head>
+<body class="bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 transition-colors duration-300 min-h-screen flex flex-col">
+
+    <!-- Top Navigation Header -->
+    <header class="sticky top-0 z-50 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 transition-colors duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <!-- App Title / Brand -->
+                <div class="flex items-center gap-3">
+                    <div class="p-2 bg-brand-500/10 text-brand-600 dark:text-brand-400 rounded-xl">
+                        <i data-lucide="layout-dashboard" class="w-6 h-6"></i>
+                    </div>
+                    <div>
+                        <h1 class="font-bold text-lg leading-tight tracking-tight text-slate-900 dark:text-white">AURA Intelligence</h1>
+                        <p class="text-xs text-slate-500 dark:text-slate-400">Multi-Domain Operational & Epidemiological Portal</p>
+                    </div>
+                </div>
+
+                <!-- Navigation Tabs -->
+                <nav class="hidden md:flex space-x-1 bg-slate-100 dark:bg-slate-800/60 p-1 rounded-xl border border-slate-200 dark:border-slate-700/50">
+                    <button onclick="switchTab('covid-global')" id="nav-covid-global" class="tab-btn px-4 py-2 rounded-lg text-xs font-semibold transition-all duration-200 bg-white dark:bg-slate-700 text-brand-600 dark:text-brand-400 shadow-sm">
+                        <i data-lucide="globe" class="w-3.5 h-3.5 inline-block mr-1.5"></i> Global COVID-19
+                    </button>
+                    <button onclick="switchTab('covid-testing')" id="nav-covid-testing" class="tab-btn px-4 py-2 rounded-lg text-xs font-medium text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-all duration-200">
+                        <i data-lucide="activity" class="w-3.5 h-3.5 inline-block mr-1.5"></i> Testing Metrics
+                    </button>
+                    <button onclick="switchTab('restaurant')" id="nav-restaurant" class="tab-btn px-4 py-2 rounded-lg text-xs font-medium text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-all duration-200">
+                        <i data-lucide="utensils" class="w-3.5 h-3.5 inline-block mr-1.5"></i> Restaurant Ops
+                    </button>
+                </nav>
+
+                <!-- Header Action Buttons -->
+                <div class="flex items-center gap-3">
+                    <!-- Date badge -->
+                    <div class="hidden lg:flex items-center text-xs text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700">
+                        <i data-lucide="calendar" class="w-3.5 h-3.5 mr-1.5 text-slate-400"></i>
+                        <span>Dataset Snapshot: July 29, 2020</span>
+                    </div>
+
+                    <!-- Dark / Light Theme Toggle -->
+                    <button id="themeToggle" onclick="toggleTheme()" class="p-2 text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 bg-slate-100 dark:bg-slate-800 rounded-xl hover:bg-slate-200 dark:hover:bg-slate-700 transition-all focus:outline-none" title="Toggle Theme">
+                        <i data-lucide="moon" class="w-5 h-5 hidden dark:block"></i>
+                        <i data-lucide="sun" class="w-5 h-5 block dark:hidden"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile View Navigation Switcher -->
+        <div class="flex md:hidden border-t border-slate-200 dark:border-slate-800 bg-slate-100/50 dark:bg-slate-900/50 p-2 overflow-x-auto gap-2">
+            <button onclick="switchTab('covid-global')" id="mob-covid-global" class="mob-tab-btn flex-1 min-w-max px-3 py-1.5 rounded-lg text-xs font-semibold bg-brand-500 text-white">
+                Global COVID
+            </button>
+            <button onclick="switchTab('covid-testing')" id="mob-covid-testing" class="mob-tab-btn flex-1 min-w-max px-3 py-1.5 rounded-lg text-xs font-medium text-slate-600 dark:text-slate-300">
+                Testing Metrics
+            </button>
+            <button onclick="switchTab('restaurant')" id="mob-restaurant" class="mob-tab-btn flex-1 min-w-max px-3 py-1.5 rounded-lg text-xs font-medium text-slate-600 dark:text-slate-300">
+                Restaurant Ops
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+
+        <!-- ==================== TAB 1: COVID-19 GLOBAL TRENDS ==================== -->
+        <section id="tab-covid-global" class="space-y-6">
+            <!-- Alert Banner for Historical Note -->
+            <div class="bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/50 rounded-2xl p-4 flex items-start gap-3 text-amber-800 dark:text-amber-200 text-xs sm:text-sm">
+                <i data-lucide="alert-triangle" class="w-5 h-5 flex-shrink-0 text-amber-600 dark:text-amber-400 mt-0.5"></i>
+                <div class="space-y-0.5">
+                    <span class="font-semibold">Historical Snapshot Notice:</span>
+                    <p class="text-amber-700 dark:text-amber-300/80">
+                        Data covers 33,417 records across 210 locations from 31 Dec 2019 through 29 July 2020. Metrics reflect reported figures dependent on testing availability and recording methodologies.
+                    </p>
+                </div>
+            </div>
+
+            <!-- KPI Cards Grid -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm hover:shadow-md transition-shadow">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="text-xs font-medium text-slate-500 dark:text-slate-400">Total Confirmed Cases</p>
+                            <h3 class="text-2xl font-bold text-slate-900 dark:text-white mt-1">16,708,224</h3>
+                            <span class="inline-flex items-center text-xs text-emerald-600 dark:text-emerald-400 font-medium mt-1">
+                                <i data-lucide="trending-up" class="w-3.5 h-3.5 mr-1"></i> Peak in July 2020
+                            </span>
+                        </div>
+                        <div class="p-3 bg-blue-50 dark:bg-blue-950/50 rounded-xl text-blue-600 dark:text-blue-400">
+                            <i data-lucide="users" class="w-5 h-5"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm hover:shadow-md transition-shadow">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="text-xs font-medium text-slate-500 dark:text-slate-400">Total Reported Deaths</p>
+                            <h3 class="text-2xl font-bold text-slate-900 dark:text-white mt-1">660,116</h3>
+                            <span class="inline-flex items-center text-xs text-rose-600 dark:text-rose-400 font-medium mt-1">
+                                <i data-lucide="activity" class="w-3.5 h-3.5 mr-1"></i> Global Aggregate
+                            </span>
+                        </div>
+                        <div class="p-3 bg-rose-50 dark:bg-rose-950/50 rounded-xl text-rose-600 dark:text-rose-400">
+                            <i data-lucide="heart-pulse" class="w-5 h-5"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm hover:shadow-md transition-shadow">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="text-xs font-medium text-slate-500 dark:text-slate-400">Case-Fatality Ratio (CFR)</p>
+                            <h3 class="text-2xl font-bold text-slate-900 dark:text-white mt-1">3.95%</h3>
+                            <span class="inline-flex items-center text-xs text-amber-600 dark:text-amber-400 font-medium mt-1">
+                                Europe Peak: 7.27%
+                            </span>
+                        </div>
+                        <div class="p-3 bg-amber-50 dark:bg-amber-950/50 rounded-xl text-amber-600 dark:text-amber-400">
+                            <i data-lucide="percent" class="w-5 h-5"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm hover:shadow-md transition-shadow">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="text-xs font-medium text-slate-500 dark:text-slate-400">Locations Tracked</p>
+                            <h3 class="text-2xl font-bold text-slate-900 dark:text-white mt-1">210</h3>
+                            <span class="inline-flex items-center text-xs text-slate-500 dark:text-slate-400 font-medium mt-1">
+                                Across 6 Continents
+                            </span>
+                        </div>
+                        <div class="p-3 bg-indigo-50 dark:bg-indigo-950/50 rounded-xl text-indigo-600 dark:text-indigo-400">
+                            <i data-lucide="map-pin" class="w-5 h-5"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts Section 1: Monthly Trend & Top Affected Countries -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <!-- Line Chart: Monthly Trend -->
+                <div class="lg:col-span-7 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
+                        <div>
+                            <h3 class="text-base font-bold text-slate-900 dark:text-white">Monthly Reported New Cases</h3>
+                            <p class="text-xs text-slate-500 dark:text-slate-400">Cumulative daily additions aggregated per month (Jan 2020 - July 2020)</p>
+                        </div>
+                        <span class="text-xs font-semibold px-2.5 py-1 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded-md self-start sm:self-auto">
+                            July MTD: 6.43M
+                        </span>
+                    </div>
+                    <div class="h-72">
+                        <canvas id="monthlyTrendChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Bar Chart: Top 10 Countries -->
+                <div class="lg:col-span-5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm">
+                    <div class="flex items-center justify-between mb-4">
+                        <div>
+                            <h3 class="text-base font-bold text-slate-900 dark:text-white">Top 10 Affected Countries</h3>
+                            <p class="text-xs text-slate-500 dark:text-slate-400">Total confirmed cumulative cases</p>
+                        </div>
+                    </div>
+                    <div class="h-72">
+                        <canvas id="topCountriesChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section 2: Continent Level Comparison & High Case-Fatality Analysis -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <!-- Continent Analytics Bar & Per-Capita Breakdown -->
+                <div class="lg:col-span-6 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm">
+                    <div class="mb-4">
+                        <h3 class="text-base font-bold text-slate-900 dark:text-white">Continent-Level Burden Analysis</h3>
+                        <p class="text-xs text-slate-500 dark:text-slate-400">Comparison of cases, deaths, and per-million metrics</p>
+                    </div>
+                    <div class="h-64 mb-4">
+                        <canvas id="continentCasesChart"></canvas>
+                    </div>
+                    <!-- Continent Data Table -->
+                    <div class="overflow-x-auto border-t border-slate-100 dark:border-slate-800 pt-3">
+                        <table class="w-full text-left text-xs">
+                            <thead>
+                                <tr class="text-slate-400 dark:text-slate-500 font-semibold border-b border-slate-100 dark:border-slate-800">
+                                    <th class="pb-2">Continent</th>
+                                    <th class="pb-2">Cases</th>
+                                    <th class="pb-2">Deaths</th>
+                                    <th class="pb-2">Cases/M</th>
+                                    <th class="pb-2">CFR</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100 dark:divide-slate-800/50 text-slate-700 dark:text-slate-300">
+                                <tr>
+                                    <td class="py-2 font-medium">North America</td>
+                                    <td>5,146,329</td>
+                                    <td>209,663</td>
+                                    <td>8,704</td>
+                                    <td class="text-amber-600 dark:text-amber-400">4.07%</td>
+                                </tr>
+                                <tr>
+                                    <td class="py-2 font-medium">Asia</td>
+                                    <td>4,053,864</td>
+                                    <td>92,728</td>
+                                    <td>880</td>
+                                    <td>2.29%</td>
+                                </tr>
+                                <tr>
+                                    <td class="py-2 font-medium">South America</td>
+                                    <td>3,841,772</td>
+                                    <td>137,126</td>
+                                    <td class="font-semibold text-brand-600 dark:text-brand-400">8,925</td>
+                                    <td>3.57%</td>
+                                </tr>
+                                <tr>
+                                    <td class="py-2 font-medium">Europe</td>
+                                    <td>2,775,850</td>
+                                    <td>201,931</td>
+                                    <td>3,709</td>
+                                    <td class="font-semibold text-rose-600 dark:text-rose-400">7.27%</td>
+                                </tr>
+                                <tr>
+                                    <td class="py-2 font-medium">Africa</td>
+                                    <td>873,331</td>
+                                    <td>18,471</td>
+                                    <td>652</td>
+                                    <td>2.12%</td>
+                                </tr>
+                                <tr>
+                                    <td class="py-2 font-medium">Oceania</td>
+                                    <td>17,078</td>
+                                    <td>197</td>
+                                    <td>417</td>
+                                    <td>1.15%</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Case-Fatality Ratio (CFR) Highest Ratios -->
+                <div class="lg:col-span-6 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm">
+                    <div class="mb-4">
+                        <h3 class="text-base font-bold text-slate-900 dark:text-white">Highest Reported Case-Fatality Ratios</h3>
+                        <p class="text-xs text-slate-500 dark:text-slate-400">Countries with ≥1,000 confirmed cases (Deaths as % of cases)</p>
+                    </div>
+                    <div class="h-64">
+                        <canvas id="cfrChart"></canvas>
+                    </div>
+                    <div class="mt-4 p-3 bg-slate-50 dark:bg-slate-800/50 rounded-xl text-xs text-slate-600 dark:text-slate-400 border border-slate-200/60 dark:border-slate-700/50">
+                        <p class="font-medium text-slate-800 dark:text-slate-200 mb-1">Analytical Context Note:</p>
+                        High crude CFR values (e.g. Yemen 28.6%, France 16.5%, UK 15.3%) often reflect testing bottlenecks prioritized for severe hospital cases, demographic factors, and differing reporting criteria rather than pure biological mortality.
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- ==================== TAB 2: COVID-19 TESTING & DIAGNOSTICS ==================== -->
+        <section id="tab-covid-testing" class="space-y-6 hidden">
+            <!-- Summary Header Cards -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm">
+                    <p class="text-xs font-medium text-slate-500 dark:text-slate-400">Reporting Entities</p>
+                    <h3 class="text-2xl font-bold text-slate-900 dark:text-white mt-1">103 Series</h3>
+                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">98 with usable totals</p>
+                </div>
+                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm">
+                    <p class="text-xs font-medium text-slate-500 dark:text-slate-400">Peak Testing Intensity</p>
+                    <h3 class="text-2xl font-bold text-brand-600 dark:text-brand-400 mt-1">664.6 / 1,000</h3>
+                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Luxembourg (People Tested)</p>
+                </div>
+                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm">
+                    <p class="text-xs font-medium text-slate-500 dark:text-slate-400">7-Day Smoothed Median Rate</p>
+                    <h3 class="text-2xl font-bold text-emerald-600 dark:text-emerald-400 mt-1">0.451 / 1,000</h3>
+                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">As of July 29, 2020 (29 entities)</p>
+                </div>
+                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm">
+                    <p class="text-xs font-medium text-slate-500 dark:text-slate-400">Dataset Rows & Span</p>
+                    <h3 class="text-2xl font-bold text-slate-900 dark:text-white mt-1">13,679 Rows</h3>
+                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">01 Jan 2020 - 29 Jul 2020</p>
+                </div>
+            </div>
+
+            <!-- Testing Charts Grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <!-- Highest Testing Intensity per 1000 -->
+                <div class="lg:col-span-6 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm">
+                    <div class="mb-4">
+                        <h3 class="text-base font-bold text-slate-900 dark:text-white">Highest Cumulative Testing Intensity</h3>
+                        <p class="text-xs text-slate-500 dark:text-slate-400">Cumulative total tests performed/people tested per 1,000 population</p>
+                    </div>
+                    <div class="h-72">
+                        <canvas id="testingIntensityChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Largest Absolute Testing Totals -->
+                <div class="lg:col-span-6 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm">
+                    <div class="mb-4">
+                        <h3 class="text-base font-bold text-slate-900 dark:text-white">Largest Cumulative Volume Series</h3>
+                        <p class="text-xs text-slate-500 dark:text-slate-400">Raw cumulative test counts by reporting entity</p>
+                    </div>
+                    <div class="h-72">
+                        <canvas id="testingVolumeChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Daily Activity Trend & Data Quality Panel -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <!-- Daily Smoothed Trend -->
+                <div class="lg:col-span-7 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm">
+                    <div class="mb-4">
+                        <h3 class="text-base font-bold text-slate-900 dark:text-white">Median 7-Day Smoothed Daily Testing Rate</h3>
+                        <p class="text-xs text-slate-500 dark:text-slate-400">Cross-entity median reported daily change per 1,000 population</p>
+                    </div>
+                    <div class="h-64">
+                        <canvas id="dailyTestingTrendChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Data Completeness & Metric Definition Breakdown -->
+                <div class="lg:col-span-5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm flex flex-col justify-between">
+                    <div>
+                        <h3 class="text-base font-bold text-slate-900 dark:text-white mb-1">Testing Units & Quality Matrix</h3>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 mb-4">Understanding data definitions and missingness</p>
+
+                        <!-- Units Grid -->
+                        <div class="space-y-3">
+                            <div class="p-3 bg-slate-50 dark:bg-slate-800/40 rounded-xl border border-slate-100 dark:border-slate-800 flex items-start gap-3">
+                                <div class="p-2 bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400 rounded-lg">
+                                    <i data-lucide="user-check" class="w-4 h-4"></i>
+                                </div>
+                                <div class="text-xs">
+                                    <span class="font-bold text-slate-800 dark:text-slate-200">People Tested:</span>
+                                    <p class="text-slate-500 dark:text-slate-400">Counts unique individuals. Best indicator of population coverage.</p>
+                                </div>
+                            </div>
+
+                            <div class="p-3 bg-slate-50 dark:bg-slate-800/40 rounded-xl border border-slate-100 dark:border-slate-800 flex items-start gap-3">
+                                <div class="p-2 bg-emerald-100 dark:bg-emerald-900/40 text-emerald-600 dark:text-emerald-400 rounded-lg">
+                                    <i data-lucide="file-text" class="w-4 h-4"></i>
+                                </div>
+                                <div class="text-xs">
+                                    <span class="font-bold text-slate-800 dark:text-slate-200">Tests Performed:</span>
+                                    <p class="text-slate-500 dark:text-slate-400">Counts total test events. Individuals may have multiple tests.</p>
+                                </div>
+                            </div>
+
+                            <div class="p-3 bg-slate-50 dark:bg-slate-800/40 rounded-xl border border-slate-100 dark:border-slate-800 flex items-start gap-3">
+                                <div class="p-2 bg-purple-100 dark:bg-purple-900/40 text-purple-600 dark:text-purple-400 rounded-lg">
+                                    <i data-lucide="flask-conical" class="w-4 h-4"></i>
+                                </div>
+                                <div class="text-xs">
+                                    <span class="font-bold text-slate-800 dark:text-slate-200">Samples Tested:</span>
+                                    <p class="text-slate-500 dark:text-slate-400">Counts biological specimens processed in labs.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Completeness stats -->
+                    <div class="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800 grid grid-cols-3 gap-2 text-center text-xs">
+                        <div class="p-2 rounded-lg bg-slate-100 dark:bg-slate-800">
+                            <span class="block font-bold text-slate-900 dark:text-white">83.8%</span>
+                            <span class="text-[10px] text-slate-500">Cumulative Valid</span>
+                        </div>
+                        <div class="p-2 rounded-lg bg-slate-100 dark:bg-slate-800">
+                            <span class="block font-bold text-slate-900 dark:text-white">81.4%</span>
+                            <span class="text-[10px] text-slate-500">Daily Rates Present</span>
+                        </div>
+                        <div class="p-2 rounded-lg bg-slate-100 dark:bg-slate-800">
+                            <span class="block font-bold text-slate-900 dark:text-white">86.4%</span>
+                            <span class="text-[10px] text-slate-500">Source Labels</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- ==================== TAB 3: RESTAURANT PERFORMANCE ==================== -->
+        <section id="tab-restaurant" class="space-y-6 hidden">
+            <!-- Header Operational Overview -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="text-xs font-medium text-slate-500 dark:text-slate-400">Total Monthly Revenue</p>
+                            <h3 class="text-2xl font-bold text-slate-900 dark:text-white mt-1">$485,200</h3>
+                            <span class="text-xs text-emerald-600 dark:text-emerald-400 font-medium">Margin: 34.2% Net</span>
+                        </div>
+                        <div class="p-3 bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400 rounded-xl">
+                            <i data-lucide="dollar-sign" class="w-5 h-5"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="text-xs font-medium text-slate-500 dark:text-slate-400">Average Order Value (AOV)</p>
+                            <h3 class="text-2xl font-bold text-slate-900 dark:text-white mt-1">$42.80</h3>
+                            <span class="text-xs text-brand-600 dark:text-brand-400 font-medium">Peak Hour +18%</span>
+                        </div>
+                        <div class="p-3 bg-blue-50 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400 rounded-xl">
+                            <i data-lucide="shopping-bag" class="w-5 h-5"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="text-xs font-medium text-slate-500 dark:text-slate-400">Avg Prep & Wait Time</p>
+                            <h3 class="text-2xl font-bold text-amber-600 dark:text-amber-400 mt-1">18.4 min / 12.2 min</h3>
+                            <span class="text-xs text-rose-500 font-medium">Peak Bottleneck Detected</span>
+                        </div>
+                        <div class="p-3 bg-amber-50 dark:bg-amber-950/50 text-amber-600 dark:text-amber-400 rounded-xl">
+                            <i data-lucide="clock" class="w-5 h-5"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="text-xs font-medium text-slate-500 dark:text-slate-400">Customer Satisfaction</p>
+                            <h3 class="text-2xl font-bold text-slate-900 dark:text-white mt-1">4.65 / 5.0</h3>
+                            <span class="text-xs text-emerald-600 dark:text-emerald-400 font-medium">Based on 1,420 Reviews</span>
+                        </div>
+                        <div class="p-3 bg-purple-50 dark:bg-purple-950/50 text-purple-600 dark:text-purple-400 rounded-xl">
+                            <i data-lucide="star" class="w-5 h-5"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Restaurant Charts -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <!-- Financials vs Operational Costs by Branch -->
+                <div class="lg:col-span-7 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm">
+                    <div class="mb-4">
+                        <h3 class="text-base font-bold text-slate-900 dark:text-white">Branch Revenue vs. Operating Costs</h3>
+                        <p class="text-xs text-slate-500 dark:text-slate-400">Financial margin evaluation across main locations</p>
+                    </div>
+                    <div class="h-72">
+                        <canvas id="restaurantFinancialsChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Prep Time vs Customer Rating Correlation -->
+                <div class="lg:col-span-5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm">
+                    <div class="mb-4">
+                        <h3 class="text-base font-bold text-slate-900 dark:text-white">Prep Time Impact on Customer Rating</h3>
+                        <p class="text-xs text-slate-500 dark:text-slate-400">Relationship between kitchen delay and review score</p>
+                    </div>
+                    <div class="h-72">
+                        <canvas id="prepRatingChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Marketing Spend, CAC & Strategic Recommendations -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <!-- Channel CAC Efficiency -->
+                <div class="lg:col-span-6 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm">
+                    <div class="mb-4">
+                        <h3 class="text-base font-bold text-slate-900 dark:text-white">Marketing Spend vs Customer Acquisition Cost (CAC)</h3>
+                        <p class="text-xs text-slate-500 dark:text-slate-400">Efficiency across promotional channels</p>
+                    </div>
+                    <div class="h-64">
+                        <canvas id="marketingCacChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Strategic Recommendations Panel -->
+                <div class="lg:col-span-6 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center gap-2 mb-3">
+                            <div class="p-2 bg-brand-500/10 text-brand-600 dark:text-brand-400 rounded-lg">
+                                <i data-lucide="lightbulb" class="w-5 h-5"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-base font-bold text-slate-900 dark:text-white">Strategic Operations Action Plan</h3>
+                                <p class="text-xs text-slate-500 dark:text-slate-400">Data-driven recommendations from operational analysis</p>
+                            </div>
+                        </div>
+
+                        <div class="space-y-3 mt-4">
+                            <div class="p-3.5 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-100 dark:border-slate-800">
+                                <div class="flex items-center justify-between mb-1">
+                                    <span class="text-xs font-bold text-slate-900 dark:text-white">1. Reduce Peak Prep Delays</span>
+                                    <span class="px-2 py-0.5 text-[10px] bg-rose-100 dark:bg-rose-950 text-rose-600 dark:text-rose-400 font-semibold rounded">High Priority</span>
+                                </div>
+                                <p class="text-xs text-slate-600 dark:text-slate-400">
+                                    Reallocate staffing during high-volume peak hours to streamline prep times below 15 minutes, preserving customer satisfaction ratings above 4.5.
+                                </p>
+                            </div>
+
+                            <div class="p-3.5 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-100 dark:border-slate-800">
+                                <div class="flex items-center justify-between mb-1">
+                                    <span class="text-xs font-bold text-slate-900 dark:text-white">2. High-AOV Menu Optimization</span>
+                                    <span class="px-2 py-0.5 text-[10px] bg-amber-100 dark:bg-amber-950 text-amber-600 dark:text-amber-400 font-semibold rounded">Medium Priority</span>
+                                </div>
+                                <p class="text-xs text-slate-600 dark:text-slate-400">
+                                    Highlight high-margin, high-AOV signature pairings on digital menus to offset elevated operational and labor costs.
+                                </p>
+                            </div>
+
+                            <div class="p-3.5 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-100 dark:border-slate-800">
+                                <div class="flex items-center justify-between mb-1">
+                                    <span class="text-xs font-bold text-slate-900 dark:text-white">3. Refine Marketing Channel Budgeting</span>
+                                    <span class="px-2 py-0.5 text-[10px] bg-emerald-100 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400 font-semibold rounded">Optimization</span>
+                                </div>
+                                <p class="text-xs text-slate-600 dark:text-slate-400">
+                                    Shift budget away from high-CAC digital banner ads toward high-converting local organic promos to lower overall CAC from $14.20 to <$9.50.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 text-[11px] text-slate-400 text-right italic">
+                        Evaluation strictly derived from restaurant-performance.csv schema parameters.
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Global Footer -->
+    <footer class="bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 py-4 transition-colors duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 dark:text-slate-400 gap-2">
+            <div>
+                © 2026 AURA Multi-Domain Analytics Intelligence. Historical Snapshot Dataset (31 Dec 2019 – 29 Jul 2020).
+            </div>
+            <div class="flex items-center space-x-4">
+                <span>Integrated Reports: 1.pdf, 2.pdf, 3.pdf</span>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript Charts & Interactivity Logic -->
+    <script>
+        // Initialize Lucide Icons
+        lucide.createIcons();
+
+        // Theme Toggle Functionality
+        function toggleTheme() {
+            const html = document.documentElement;
+            if (html.classList.contains('dark')) {
+                html.classList.remove('dark');
+                localStorage.setItem('theme', 'light');
+            } else {
+                html.classList.add('dark');
+                localStorage.setItem('theme', 'dark');
+            }
+            updateChartThemes();
+        }
+
+        // Tab Switching Logic
+        function switchTab(tabId) {
+            const tabs = ['covid-global', 'covid-testing', 'restaurant'];
+            
+            tabs.forEach(id => {
+                const section = document.getElementById(`tab-${id}`);
+                const navBtn = document.getElementById(`nav-${id}`);
+                const mobBtn = document.getElementById(`mob-${id}`);
+
+                if (id === tabId) {
+                    section.classList.remove('hidden');
+                    
+                    // Desktop active style
+                    navBtn.className = "tab-btn px-4 py-2 rounded-lg text-xs font-semibold transition-all duration-200 bg-white dark:bg-slate-700 text-brand-600 dark:text-brand-400 shadow-sm";
+                    
+                    // Mobile active style
+                    mobBtn.className = "mob-tab-btn flex-1 min-w-max px-3 py-1.5 rounded-lg text-xs font-semibold bg-brand-500 text-white";
+                } else {
+                    section.classList.add('hidden');
+                    
+                    // Desktop inactive style
+                    navBtn.className = "tab-btn px-4 py-2 rounded-lg text-xs font-medium text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-all duration-200";
+                    
+                    // Mobile inactive style
+                    mobBtn.className = "mob-tab-btn flex-1 min-w-max px-3 py-1.5 rounded-lg text-xs font-medium text-slate-600 dark:text-slate-300";
+                }
+            });
+        }
+
+        // Global Chart Instances Store
+        let chartInstances = {};
+
+        // Helper function for dark/light mode chart colors
+        function getChartColors() {
+            const isDark = document.documentElement.classList.contains('dark');
+            return {
+                text: isDark ? '#94a3b8' : '#64748b',
+                grid: isDark ? 'rgba(51, 65, 85, 0.4)' : 'rgba(226, 232, 240, 0.8)',
+                brand: '#0284c7',
+                brandLight: 'rgba(2, 132, 199, 0.15)',
+                rose: '#f43f5e',
+                emerald: '#10b981',
+                amber: '#f59e0b',
+                purple: '#8b5cf6',
+            };
+        }
+
+        // Initialize All Charts
+        function initCharts() {
+            const colors = getChartColors();
+
+            // 1. Monthly Reported New Cases Line Chart (Report 1)
+            const ctxMonthly = document.getElementById('monthlyTrendChart').getContext('2d');
+            chartInstances.monthlyTrend = new Chart(ctxMonthly, {
+                type: 'line',
+                data: {
+                    labels: ['Jan 2020', 'Feb 2020', 'Mar 2020', 'Apr 2020', 'May 2020', 'Jun 2020', 'Jul 2020 (MTD)'],
+                    datasets: [{
+                        label: 'Monthly New Cases',
+                        data: [9839, 74758, 718873, 2341908, 2891970, 4249826, 6435370],
+                        borderColor: colors.brand,
+                        backgroundColor: colors.brandLight,
+                        fill: true,
+                        tension: 0.35,
+                        pointBackgroundColor: colors.brand,
+                        pointRadius: 5,
+                        pointHoverRadius: 7
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return ` Cases: ${context.raw.toLocaleString()}`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: { grid: { color: colors.grid }, ticks: { color: colors.text, font: { size: 11 } } },
+                        y: { 
+                            grid: { color: colors.grid }, 
+                            ticks: { 
+                                color: colors.text, 
+                                font: { size: 11 },
+                                callback: value => (value / 1e6).toFixed(1) + 'M'
+                            } 
+                        }
+                    }
+                }
+            });
+
+            // 2. Top 10 Countries Horizontal Bar Chart (Report 1)
+            const ctxTopCountries = document.getElementById('topCountriesChart').getContext('2d');
+            chartInstances.topCountries = new Chart(ctxTopCountries, {
+                type: 'bar',
+                data: {
+                    labels: ['United States', 'Brazil', 'India', 'Russia', 'South Africa', 'Mexico', 'Peru', 'Chile', 'United Kingdom', 'Iran'],
+                    datasets: [{
+                        label: 'Confirmed Cases',
+                        data: [4351997, 2483191, 1531669, 823515, 459761, 402697, 395005, 349800, 301455, 298909],
+                        backgroundColor: colors.brand,
+                        borderRadius: 6,
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return ` Cases: ${context.raw.toLocaleString()}`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: { 
+                            grid: { color: colors.grid }, 
+                            ticks: { 
+                                color: colors.text, 
+                                font: { size: 10 },
+                                callback: value => (value / 1e6).toFixed(1) + 'M'
+                            } 
+                        },
+                        y: { grid: { display: false }, ticks: { color: colors.text, font: { size: 11 } } }
+                    }
+                }
+            });
+
+            // 3. Continent Cases Bar Chart (Report 1)
+            const ctxContinent = document.getElementById('continentCasesChart').getContext('2d');
+            chartInstances.continent = new Chart(ctxContinent, {
+                type: 'bar',
+                data: {
+                    labels: ['North America', 'Asia', 'South America', 'Europe', 'Africa', 'Oceania'],
+                    datasets: [{
+                        label: 'Total Cases',
+                        data: [5146329, 4053864, 3841772, 2775850, 873331, 17078],
+                        backgroundColor: [
+                            colors.brand,
+                            '#3b82f6',
+                            '#6366f1',
+                            '#8b5cf6',
+                            '#ec4899',
+                            '#14b8a6'
+                        ],
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { grid: { display: false }, ticks: { color: colors.text, font: { size: 10 } } },
+                        y: { 
+                            grid: { color: colors.grid }, 
+                            ticks: { 
+                                color: colors.text, 
+                                font: { size: 10 },
+                                callback: value => (value / 1e6).toFixed(1) + 'M'
+                            } 
+                        }
+                    }
+                }
+            });
+
+            // 4. Case Fatality Ratio (CFR) Highest Ratios (Report 1)
+            const ctxCfr = document.getElementById('cfrChart').getContext('2d');
+            chartInstances.cfr = new Chart(ctxCfr, {
+                type: 'bar',
+                data: {
+                    labels: ['Yemen', 'France', 'United Kingdom', 'Belgium', 'Italy', 'Hungary', 'Netherlands', 'Mexico', 'Spain', 'Canada'],
+                    datasets: [{
+                        label: 'CFR (%)',
+                        data: [28.6, 16.5, 15.3, 14.8, 14.3, 13.4, 11.5, 11.1, 10.1, 7.8],
+                        backgroundColor: colors.rose,
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { 
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: ctx => ` CFR: ${ctx.raw}%`
+                            }
+                        }
+                    },
+                    scales: {
+                        x: { grid: { color: colors.grid }, ticks: { color: colors.text, font: { size: 10 }, callback: v => v + '%' } },
+                        y: { grid: { display: false }, ticks: { color: colors.text, font: { size: 11 } } }
+                    }
+                }
+            });
+
+            // 5. Highest Testing Intensity per 1000 (Report 2)
+            const ctxTestIntensity = document.getElementById('testingIntensityChart').getContext('2d');
+            chartInstances.testIntensity = new Chart(ctxTestIntensity, {
+                type: 'bar',
+                data: {
+                    labels: [
+                        'Luxembourg (people)',
+                        'UAE (samples)',
+                        'Bahrain (unclear)',
+                        'Malta (tests)',
+                        'Denmark (tests)',
+                        'Singapore (samples)',
+                        'Iceland (tests)',
+                        'Russia (tests)'
+                    ],
+                    datasets: [{
+                        label: 'Cumulative / 1,000',
+                        data: [664.6, 502.1, 475.0, 256.5, 252.7, 225.8, 202.5, 188.9],
+                        backgroundColor: colors.emerald,
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { grid: { color: colors.grid }, ticks: { color: colors.text, font: { size: 10 } } },
+                        y: { grid: { display: false }, ticks: { color: colors.text, font: { size: 10 } } }
+                    }
+                }
+            });
+
+            // 6. Largest Cumulative Testing Volume (Report 2)
+            const ctxTestVolume = document.getElementById('testingVolumeChart').getContext('2d');
+            chartInstances.testVolume = new Chart(ctxTestVolume, {
+                type: 'bar',
+                data: {
+                    labels: [
+                        'US (unclear)',
+                        'US (CDC tests)',
+                        'Russia (tests)',
+                        'India (samples)',
+                        'UK (tests)',
+                        'Germany (tests)',
+                        'Italy (tests)'
+                    ],
+                    datasets: [{
+                        label: 'Total Tests Recorded',
+                        data: [54100000, 53000000, 27500000, 17800000, 9200000, 8000000, 6800000],
+                        backgroundColor: colors.brand,
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { grid: { color: colors.grid }, ticks: { color: colors.text, font: { size: 10 }, callback: v => (v / 1e6) + 'M' } },
+                        y: { grid: { display: false }, ticks: { color: colors.text, font: { size: 10 } } }
+                    }
+                }
+            });
+
+            // 7. Daily 7-day Smoothed Median Testing Trend (Report 2)
+            const ctxDailyTesting = document.getElementById('dailyTestingTrendChart').getContext('2d');
+            chartInstances.dailyTesting = new Chart(ctxDailyTesting, {
+                type: 'line',
+                data: {
+                    labels: ['Jan 2020', 'Feb 2020', 'Mar 2020', 'Apr 2020', 'May 2020', 'Jun 2020', 'Jul 2020'],
+                    datasets: [{
+                        label: 'Median Daily Rate / 1,000',
+                        data: [0.001, 0.005, 0.025, 0.180, 0.285, 0.405, 0.451],
+                        borderColor: colors.emerald,
+                        backgroundColor: 'rgba(16, 185, 129, 0.15)',
+                        fill: true,
+                        tension: 0.4,
+                        pointRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { grid: { color: colors.grid }, ticks: { color: colors.text, font: { size: 10 } } },
+                        y: { grid: { color: colors.grid }, ticks: { color: colors.text, font: { size: 10 } } }
+                    }
+                }
+            });
+
+            // 8. Restaurant Revenue vs Costs (Report 3)
+            const ctxRestFin = document.getElementById('restaurantFinancialsChart').getContext('2d');
+            chartInstances.restFin = new Chart(ctxRestFin, {
+                type: 'bar',
+                data: {
+                    labels: ['Downtown Branch', 'Uptown Bistro', 'Westside Hub', 'Harbor View', 'Suburban Outlet'],
+                    datasets: [
+                        {
+                            label: 'Revenue ($)',
+                            data: [145000, 118000, 96000, 78000, 48200],
+                            backgroundColor: colors.brand,
+                            borderRadius: 6
+                        },
+                        {
+                            label: 'Operating Costs ($)',
+                            data: [92000, 74000, 63000, 52000, 38000],
+                            backgroundColor: colors.rose,
+                            borderRadius: 6
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: { color: colors.text, font: { size: 11 } }
+                        }
+                    },
+                    scales: {
+                        x: { grid: { display: false }, ticks: { color: colors.text, font: { size: 10 } } },
+                        y: { grid: { color: colors.grid }, ticks: { color: colors.text, font: { size: 10 }, callback: v => '$' + (v / 1000) + 'k' } }
+                    }
+                }
+            });
+
+            // 9. Prep Time vs Customer Rating Scatter/Bar (Report 3)
+            const ctxPrepRating = document.getElementById('prepRatingChart').getContext('2d');
+            chartInstances.prepRating = new Chart(ctxPrepRating, {
+                type: 'line',
+                data: {
+                    labels: ['10-12 min', '13-15 min', '16-18 min', '19-22 min', '23-28 min'],
+                    datasets: [
+                        {
+                            label: 'Customer Rating (1-5)',
+                            data: [4.9, 4.7, 4.4, 3.8, 3.1],
+                            borderColor: colors.amber,
+                            backgroundColor: 'transparent',
+                            yAxisID: 'yRating',
+                            tension: 0.3,
+                            pointRadius: 6
+                        },
+                        {
+                            label: 'Table Turnover Rate (/hr)',
+                            data: [2.8, 2.5, 2.1, 1.6, 1.1],
+                            borderColor: colors.brand,
+                            backgroundColor: 'transparent',
+                            borderDash: [5, 5],
+                            yAxisID: 'yTurnover',
+                            tension: 0.3,
+                            pointRadius: 6
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: { color: colors.text, font: { size: 11 } }
+                        }
+                    },
+                    scales: {
+                        x: { grid: { color: colors.grid }, ticks: { color: colors.text, font: { size: 10 } } },
+                        yRating: {
+                            type: 'linear',
+                            position: 'left',
+                            min: 2.0,
+                            max: 5.0,
+                            grid: { color: colors.grid },
+                            ticks: { color: colors.text, font: { size: 10 } }
+                        },
+                        yTurnover: {
+                            type: 'linear',
+                            position: 'right',
+                            min: 0.5,
+                            max: 3.5,
+                            grid: { display: false },
+                            ticks: { color: colors.text, font: { size: 10 } }
+                        }
+                    }
+                }
+            });
+
+            // 10. Marketing Spend vs CAC (Report 3)
+            const ctxMarketing = document.getElementById('marketingCacChart').getContext('2d');
+            chartInstances.marketing = new Chart(ctxMarketing, {
+                type: 'bar',
+                data: {
+                    labels: ['Social Media Ads', 'Local Search SEO', 'Foodie Influencers', 'Email Loyalty', 'Print Flyers'],
+                    datasets: [
+                        {
+                            label: 'Marketing Spend ($)',
+                            data: [12500, 8200, 6500, 3100, 2400],
+                            backgroundColor: colors.purple,
+                            borderRadius: 6
+                        },
+                        {
+                            label: 'CAC ($ per Acquisition)',
+                            data: [14.5, 7.2, 11.8, 4.1, 18.2],
+                            backgroundColor: colors.amber,
+                            borderRadius: 6
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: { color: colors.text, font: { size: 11 } }
+                        }
+                    },
+                    scales: {
+                        x: { grid: { display: false }, ticks: { color: colors.text, font: { size: 10 } } },
+                        y: { grid: { color: colors.grid }, ticks: { color: colors.text, font: { size: 10 } } }
+                    }
+                }
+            });
+        }
+
+        // Update colors when theme changes
+        function updateChartThemes() {
+            const colors = getChartColors();
+            Object.values(chartInstances).forEach(chart => {
+                if (chart.options.scales.x) {
+                    chart.options.scales.x.ticks.color = colors.text;
+                    if (chart.options.scales.x.grid) chart.options.scales.x.grid.color = colors.grid;
+                }
+                if (chart.options.scales.y) {
+                    chart.options.scales.y.ticks.color = colors.text;
+                    if (chart.options.scales.y.grid) chart.options.scales.y.grid.color = colors.grid;
+                }
+                if (chart.options.scales.yRating) chart.options.scales.yRating.ticks.color = colors.text;
+                if (chart.options.scales.yTurnover) chart.options.scales.yTurnover.ticks.color = colors.text;
+                
+                if (chart.options.plugins.legend && chart.options.plugins.legend.labels) {
+                    chart.options.plugins.legend.labels.color = colors.text;
+                }
+                chart.update();
+            });
+        }
+
+        // Initialize on load
+        window.onload = function() {
+            initCharts();
+        };
+    </script>
+</body>
+</html>
